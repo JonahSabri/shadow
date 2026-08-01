@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #09090b;
+  --surface: #111113;
+  --surface-2: #18181b;
+  --border: rgba(255,255,255,0.07);
+  --accent: #c0392b;
+  --accent-light: #e74c3c;
+  --gold: #C9A84C;
+  --text: #fafafa;
+  --muted: rgba(255,255,255,0.5);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Vazirmatn, 'Segoe UI', system-ui, sans-serif;
+  direction: rtl;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Regular.woff2') format('woff2');
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Bold.woff2') format('woff2');
+  font-weight: 700; font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Black.woff2') format('woff2');
+  font-weight: 900; font-display: swap;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color: rgba(192,57,43,0.35); transform: translateY(-2px); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .2rem .6rem; border-radius: 999px; font-size: .7rem; font-weight: 700;
+}
+.badge-sale { background: rgba(192,57,43,0.15); color: #e74c3c; }
+.badge-rent { background: rgba(65,196,217,0.15); color: #41c4d9; }
+.badge-featured { background: rgba(201,168,76,0.15); color: #C9A84C; }
+.badge-urgent  { background: rgba(239,68,68,0.2);  color: #ef4444; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: .4rem; cursor: pointer;
+  border-radius: .75rem; padding: .55rem 1.25rem; font-weight: 700; font-size: .85rem;
+  border: 1px solid transparent; transition: all .2s;
+}
+.btn-primary {
+  background: var(--accent); color: #fff;
+  box-shadow: 0 4px 20px rgba(192,57,43,0.35);
+}
+.btn-primary:hover { background: var(--accent-light); }
+.btn-ghost {
+  background: rgba(255,255,255,.05); color: rgba(255,255,255,.8);
+  border-color: var(--border);
+}
+.btn-ghost:hover { background: rgba(255,255,255,.09); color: #fff; }
+
+input, select {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: .65rem;
+  color: var(--text);
+  font-family: inherit;
+  font-size: .85rem;
+  padding: .55rem .9rem;
+  width: 100%;
+  transition: border-color .2s;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: rgba(192,57,43,.5);
+}
+input::placeholder { color: var(--muted); }
+select option { background: var(--surface-2); }
+
+.skeleton { background: var(--surface-2); border-radius: .5rem; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 9px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.2); }
+
+/* ---------- Responsive layout ---------- */
+
+/* Property detail: two columns on desktop, single column stacked on mobile/tablet */
+.property-detail-grid { grid-template-columns: 1fr clamp(280px, 35%, 360px); }
+@media (max-width: 860px) {
+  .property-detail-grid { grid-template-columns: 1fr; }
+}
+
+/* Header: shrink nav on small screens so it never overflows */
+@media (max-width: 520px) {
+  .header-inner { padding: 0 .65rem; }
+  .brand-text { font-size: .8rem; max-width: 40vw; }
+  .nav-link { padding: .35rem .55rem; }
+}
+@media (max-width: 400px) {
+  .nav-label { display: none; }
+  .nav-link { padding: .45rem; }
+}
+
+/* Docs endpoint header: stack path under method/title when it can't fit */
+@media (max-width: 520px) {
+  .docs-endpoint-header { padding: .85rem 1rem; }
+  .docs-endpoint-header code { flex-basis: 100%; order: 3; text-align: right !important; }
+}
+
+@media (max-width: 480px) {
+  h1 { word-break: break-word; }
+}
