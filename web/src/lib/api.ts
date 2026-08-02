@@ -91,7 +91,7 @@ export function slugify(text: string | null | undefined, maxLen = 60): string {
 }
 
 // آدرس صفحه‌ی جزئیات یک ملک با اسلاگ توصیفی، مثل /property/۹۹-ویلا-مدرن-نوشهر
-export function propertyHref(id: number, title: string): string {
+export function propertyHref(id: number, title: string | null | undefined): string {
   const slug = slugify(title);
   return slug ? `/property/${id}-${slug}` : `/property/${id}`;
 }
