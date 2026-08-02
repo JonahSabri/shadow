@@ -101,8 +101,11 @@ CURRENCY_LABELS = {"Toman": "تومان", "IRR": "ریال", "Rial": "ریال"}
 
 
 def _build_filters(params: dict[str, Any]) -> tuple[str, list[Any]]:
-    """WHERE clause مشترک بین لیست و جزئیات — فقط ملک‌های منتشرشده و فعال."""
-    clauses = ["p.is_published = 1", "p.is_active = 1"]
+    """WHERE clause مشترک بین لیست و جزئیات — فقط ملک‌های فعال.
+
+    توجه: فیلد is_published روی اکثر ملک‌های کامل (با عکس و قیمت) صفر است و
+    معیار «فعال بودن» واقعی نیست، برای همین اینجا لحاظ نمی‌شود."""
+    clauses = ["p.is_active = 1"]
     args: list[Any] = []
 
     if params.get("search"):
@@ -173,6 +176,21 @@ def _query_properties(
         )
         rows = cur.fetchall()
         return rows, total
+    finally:
+        conn.close()
+
+
+def _query_all_ids() -> list[sqlite3.Row]:
+    """لیست سبک id + تاریخ بروزرسانی همه‌ی ملک‌های فعال — برای sitemap."""
+    where_sql, args = _build_filters({})
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            f"SELECT p.id, p.updated_at {PROPERTY_JOIN_SQL} WHERE {where_sql} ORDER BY p.id",
+            args,
+        )
+        return cur.fetchall()
     finally:
         conn.close()
 
@@ -446,6 +464,21 @@ def featured_properties(
     rows, total = _query_properties(filters, "-created_at", limit, 0)
     result = _normalize_list(rows, total, 1, limit)
 
+    _cache[key] = result
+    return result
+
+
+@app.get(
+    "/properties/sitemap-ids",
+    summary="لیست سبک شناسه‌ها — برای ساخت sitemap",
+    tags=["Properties"],
+)
+def properties_sitemap_ids():
+    key = "sitemap-ids"
+    if key in _cache:
+        return _cache[key]
+    rows = _query_all_ids()
+    result = {"items": [{"id": r["id"], "updated_at": r["updated_at"]} for r in rows]}
     _cache[key] = result
     return result
 

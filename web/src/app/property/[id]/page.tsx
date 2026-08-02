@@ -13,9 +13,40 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const p = await fetchPropertyDetail(parseInt(id, 10));
   if (!p) return { title: "ملک یافت نشد" };
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const url = `${siteUrl}/property/${p.id}`;
+  const description = (p.description || p.title).slice(0, 160);
+  const cover = imageUrl(p.primary_image?.image_url);
+  const location = [p.neighborhood_name, p.city_name].filter(Boolean).join("، ");
+
+  const keywords = [
+    p.property_type_name,
+    p.city_name,
+    p.neighborhood_name,
+    p.deal_type_display,
+    location && `${p.property_type_name} در ${location}`,
+  ].filter(Boolean) as string[];
+
   return {
-    title: `${p.title} — املاک شمال`,
-    description: (p.description || p.title).slice(0, 160),
+    title: p.title,
+    description,
+    keywords,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      url,
+      title: p.title,
+      description,
+      locale: "fa_IR",
+      ...(cover ? { images: [{ url: cover }] } : {}),
+    },
+    twitter: {
+      card: cover ? "summary_large_image" : "summary",
+      title: p.title,
+      description,
+      ...(cover ? { images: [cover] } : {}),
+    },
   };
 }
 
@@ -46,19 +77,52 @@ export default async function PropertyPage({ params }: Props) {
 
   // JSON-LD
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const propertyUrl = `${siteUrl}/property/${p.id}`;
+  const allImageUrls = images.map((img) => imageUrl(img.image_url)).filter(Boolean) as string[];
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
+    "@id": propertyUrl,
     name: p.title,
     description: p.description || p.title,
-    url: `${siteUrl}/property/${p.id}`,
-    ...(images[0]?.image_url ? { image: imageUrl(images[0].image_url) } : {}),
+    url: propertyUrl,
+    ...(allImageUrls.length ? { image: allImageUrls } : {}),
+    ...(p.last_updated ? { datePosted: p.last_updated, dateModified: p.last_updated } : {}),
+    address: {
+      "@type": "PostalAddress",
+      ...(p.address ? { streetAddress: p.address } : {}),
+      ...(p.neighborhood_name ? { addressLocality: p.neighborhood_name } : {}),
+      addressRegion: p.city_name || "مازندران",
+      addressCountry: "IR",
+    },
+    ...(p.latitude && p.longitude
+      ? { geo: { "@type": "GeoCoordinates", latitude: p.latitude, longitude: p.longitude } }
+      : {}),
+    ...(p.area ? { floorSize: { "@type": "QuantitativeValue", value: p.area, unitCode: "MTK" } } : {}),
+    ...(p.bedrooms ? { numberOfBedroomsTotal: p.bedrooms } : {}),
+    ...(p.bathrooms ? { numberOfBathroomsTotal: p.bathrooms } : {}),
     offers: {
       "@type": "Offer",
       price: p.price ?? 0,
-      priceCurrency: "IRR",
+      priceCurrency: p.currency === "Toman" ? "IRR" : "IRR",
       availability: "https://schema.org/InStock",
+      url: propertyUrl,
+      businessFunction:
+        p.deal_type === "rent" ? "http://purl.org/goodrelations/v1#LeaseOut" : "http://purl.org/goodrelations/v1#Sell",
     },
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "خانه", item: siteUrl },
+      ...(p.city_name
+        ? [{ "@type": "ListItem", position: 2, name: p.city_name, item: `${siteUrl}/?city=${encodeURIComponent(p.city_name)}` }]
+        : []),
+      { "@type": "ListItem", position: p.city_name ? 3 : 2, name: p.title, item: propertyUrl },
+    ],
   };
 
   return (
@@ -67,6 +131,10 @@ export default async function PropertyPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
 
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "1.5rem 1rem" }}>

@@ -8,10 +8,28 @@ import Filters from "@/components/Filters";
 import Pagination from "@/components/Pagination";
 import { fetchProperties } from "@/lib/api";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const DESCRIPTION =
+  "لیست کامل ملک‌های فروش و اجاره در نوشهر، چالوس، نور و شمال ایران. خرید و اجاره ویلا، آپارتمان، زمین و مغازه با عکس و قیمت به‌روز.";
+
 export const metadata: Metadata = {
-  title: "لیست ملک‌های نوشهر و شمال — املاک شمال",
-  description:
-    "لیست کامل ملک‌های فروش و اجاره در نوشهر، چالوس، نور و شمال ایران. خرید ویلا، آپارتمان و زمین.",
+  title: "لیست ملک‌های نوشهر و شمال | املاک شمال",
+  description: DESCRIPTION,
+  keywords: [
+    "خرید ویلا شمال",
+    "املاک نوشهر",
+    "خرید آپارتمان چالوس",
+    "زمین نور",
+    "املاک شمال",
+  ],
+  alternates: { canonical: SITE_URL },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    title: "لیست ملک‌های نوشهر و شمال — املاک شمال",
+    description: DESCRIPTION,
+    locale: "fa_IR",
+  },
 };
 
 interface PageProps {

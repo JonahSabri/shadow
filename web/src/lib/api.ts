@@ -31,6 +31,25 @@ export async function fetchFeatured(limit = 12): Promise<PropertyListItem[]> {
   return data.items ?? [];
 }
 
+export interface SitemapEntry {
+  id: number;
+  updated_at: string | null;
+}
+
+// لیست سبک همه‌ی ملک‌ها برای ساخت sitemap.xml (بدون دانلود کل جزئیات هرکدام)
+export async function fetchSitemapIds(): Promise<SitemapEntry[]> {
+  try {
+    const res = await fetch(`${API_URL}/properties/sitemap-ids`, {
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.items ?? [];
+  } catch {
+    return [];
+  }
+}
+
 // فرمت قیمت
 export function formatPrice(price: number | null, currency = "تومان"): string {
   if (!price || price <= 0) return "توافقی";

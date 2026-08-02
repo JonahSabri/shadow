@@ -4,9 +4,19 @@ import Header from "@/components/Header";
 import PropertyCard from "@/components/PropertyCard";
 import { fetchFeatured } from "@/lib/api";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "ملک‌های ویژه نوشهر — املاک شمال",
+  title: "ملک‌های ویژه نوشهر",
   description: "ملک‌های فوری و ویژه برای خرید و اجاره در نوشهر، چالوس و شمال ایران.",
+  alternates: { canonical: `${SITE_URL}/featured` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/featured`,
+    title: "ملک‌های ویژه نوشهر — املاک شمال",
+    description: "ملک‌های فوری و ویژه برای خرید و اجاره در نوشهر، چالوس و شمال ایران.",
+    locale: "fa_IR",
+  },
 };
 
 export default async function FeaturedPage() {
