@@ -79,7 +79,8 @@ export function imageUrl(url: string | null | undefined): string | null {
 
 // اسلاگ توصیفی از عنوان ملک — طبق راهنمای سئوی گوگل، URLهایی که فقط شامل
 // شناسه‌ی عددی هستند برای کاربر و موتور جست‌وجو کم‌فایده‌اند.
-export function slugify(text: string, maxLen = 60): string {
+export function slugify(text: string | null | undefined, maxLen = 60): string {
+  if (!text) return "";
   const slug = text
     .trim()
     .replace(/[|:.,،؛«»"'()[\]{}/\\]/g, " ")
