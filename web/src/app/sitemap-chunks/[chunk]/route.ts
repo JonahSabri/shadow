@@ -9,8 +9,9 @@ export async function GET(
   { params }: { params: Promise<{ chunk: string }> }
 ) {
   const { chunk } = await params;
+  const chunkKey = chunk.replace(/\.xml$/i, "");
 
-  if (chunk === "static") {
+  if (chunkKey === "static") {
     const entries: SitemapUrlEntry[] = [
       { loc: SITE_URL, changefreq: "hourly", priority: "1" },
       { loc: `${SITE_URL}/docs`, changefreq: "weekly", priority: "0.5" },
@@ -19,7 +20,7 @@ export async function GET(
     return xmlResponse(buildUrlset(entries));
   }
 
-  const chunkId = parseInt(chunk, 10);
+  const chunkId = parseInt(chunkKey, 10);
   if (Number.isNaN(chunkId) || chunkId < 0) {
     return new Response("Not found", { status: 404 });
   }
