@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { fetchSitemapIds } from "@/lib/api";
+import { fetchSitemapIds, propertyHref } from "@/lib/api";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const propertyRoutes: MetadataRoute.Sitemap = properties.map((p) => ({
-    url: `${SITE_URL}/property/${p.id}`,
+    url: `${SITE_URL}${propertyHref(p.id, p.title)}`,
     lastModified: p.updated_at ? new Date(p.updated_at) : undefined,
     changeFrequency: "daily",
     priority: 0.7,

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPin, Maximize2, BedDouble, Bath, Car, ArrowRight, Star, Zap, Code2, ExternalLink } from "lucide-react";
 import Header from "@/components/Header";
-import { fetchPropertyDetail, formatPrice, dealLabel, imageUrl } from "@/lib/api";
+import { fetchPropertyDetail, formatPrice, dealLabel, imageUrl, propertyHref } from "@/lib/api";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!p) return { title: "ملک یافت نشد" };
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const url = `${siteUrl}/property/${p.id}`;
+  const url = `${siteUrl}${propertyHref(p.id, p.title)}`;
   const description = (p.description || p.title).slice(0, 160);
   const cover = imageUrl(p.primary_image?.image_url);
   const location = [p.neighborhood_name, p.city_name].filter(Boolean).join("، ");
@@ -77,7 +77,7 @@ export default async function PropertyPage({ params }: Props) {
 
   // JSON-LD
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const propertyUrl = `${siteUrl}/property/${p.id}`;
+  const propertyUrl = `${siteUrl}${propertyHref(p.id, p.title)}`;
   const allImageUrls = images.map((img) => imageUrl(img.image_url)).filter(Boolean) as string[];
 
   const jsonLd = {

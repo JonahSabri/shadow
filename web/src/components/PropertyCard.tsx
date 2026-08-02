@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { MapPin, Maximize2, BedDouble, Star, Zap, Eye } from "lucide-react";
 import type { PropertyListItem } from "@/types/property";
-import { formatPrice, dealLabel, imageUrl } from "@/lib/api";
+import { formatPrice, dealLabel, imageUrl, propertyHref } from "@/lib/api";
 
 export default function PropertyCard({ p }: { p: PropertyListItem }) {
   const imgSrc = imageUrl(p.primary_image?.image_url);
@@ -67,7 +67,7 @@ export default function PropertyCard({ p }: { p: PropertyListItem }) {
         <div style={{ marginTop: "auto", paddingTop: ".75rem", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: ".5rem" }}>
           <span style={{ fontWeight: 900, fontSize: ".9rem", color: p.price ? "#fff" : "var(--muted)" }}>{price}</span>
           <Link
-            href={`/property/${p.id}`}
+            href={propertyHref(p.id, p.title)}
             className="btn btn-primary"
             style={{ padding: ".35rem .9rem", fontSize: ".75rem" }}
           >

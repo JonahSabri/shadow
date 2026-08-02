@@ -33,6 +33,7 @@ export async function fetchFeatured(limit = 12): Promise<PropertyListItem[]> {
 
 export interface SitemapEntry {
   id: number;
+  title: string;
   updated_at: string | null;
 }
 
@@ -74,4 +75,22 @@ export function imageUrl(url: string | null | undefined): string | null {
   if (!url) return null;
   if (url.startsWith("/")) return `${API_URL}${url}`;
   return url;
+}
+
+// اسلاگ توصیفی از عنوان ملک — طبق راهنمای سئوی گوگل، URLهایی که فقط شامل
+// شناسه‌ی عددی هستند برای کاربر و موتور جست‌وجو کم‌فایده‌اند.
+export function slugify(text: string, maxLen = 60): string {
+  const slug = text
+    .trim()
+    .replace(/[|:.,،؛«»"'()[\]{}/\\]/g, " ")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug.slice(0, maxLen).replace(/-+$/g, "");
+}
+
+// آدرس صفحه‌ی جزئیات یک ملک با اسلاگ توصیفی، مثل /property/۹۹-ویلا-مدرن-نوشهر
+export function propertyHref(id: number, title: string): string {
+  const slug = slugify(title);
+  return slug ? `/property/${id}-${slug}` : `/property/${id}`;
 }

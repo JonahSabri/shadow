@@ -181,13 +181,13 @@ def _query_properties(
 
 
 def _query_all_ids() -> list[sqlite3.Row]:
-    """لیست سبک id + تاریخ بروزرسانی همه‌ی ملک‌های فعال — برای sitemap."""
+    """لیست سبک id + عنوان + تاریخ بروزرسانی همه‌ی ملک‌های فعال — برای sitemap."""
     where_sql, args = _build_filters({})
     conn = get_conn()
     try:
         cur = conn.cursor()
         cur.execute(
-            f"SELECT p.id, p.updated_at {PROPERTY_JOIN_SQL} WHERE {where_sql} ORDER BY p.id",
+            f"SELECT p.id, p.title, p.updated_at {PROPERTY_JOIN_SQL} WHERE {where_sql} ORDER BY p.id",
             args,
         )
         return cur.fetchall()
@@ -478,7 +478,11 @@ def properties_sitemap_ids():
     if key in _cache:
         return _cache[key]
     rows = _query_all_ids()
-    result = {"items": [{"id": r["id"], "updated_at": r["updated_at"]} for r in rows]}
+    result = {
+        "items": [
+            {"id": r["id"], "title": r["title"], "updated_at": r["updated_at"]} for r in rows
+        ]
+    }
     _cache[key] = result
     return result
 
